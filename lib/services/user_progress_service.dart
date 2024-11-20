@@ -38,7 +38,7 @@ class UserProgressService {
 
     // Check exercise duration criteria
     BadgeType exerciseBadge = BadgeType.none;
-    if (exerciseHours >= 2.5) {
+    if (exerciseHours >= 2) {
       exerciseBadge = BadgeType.gold;
     } else if (exerciseHours >= 1.5) {
       exerciseBadge = BadgeType.silver;
@@ -94,14 +94,14 @@ class UserProgressService {
     };
   }
 
-  // New method: Generate badges for the last 10 days
+  // New method: Generate badges for the last 20 days
   Future<void> generateLast10DaysBadges() async {
     final db = await DatabaseHelper.instance.database;
     final stepService = StepcountDatabaseService();
     final exerciseService = ExerciseDBService();
 
     DateTime today = DateTime.now();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       DateTime targetDate = today.subtract(Duration(days: i));
       String formattedDate =
           "${targetDate.year}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}";
@@ -184,7 +184,7 @@ class UserProgressService {
     // Query to get all records sorted by badge and step count
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
-      orderBy: 'badge DESC, stepCount DESC', // Sort by badge and step count
+      orderBy: 'date DESC',
     );
 
     return List.generate(maps.length, (i) => UserProgress.fromMap(maps[i]));
@@ -234,11 +234,11 @@ class UserProgressService {
     for (var entry in maps) {
       BadgeType badge = BadgeType.values[entry['badge']];
       if (badge == BadgeType.bronze) {
-        totalPoints += 10; // 10 points for bronze badge
+        totalPoints += 1;
       } else if (badge == BadgeType.silver) {
-        totalPoints += 20; // 20 points for silver badge
+        totalPoints += 2;
       } else if (badge == BadgeType.gold) {
-        totalPoints += 30; // 30 points for gold badge
+        totalPoints += 3;
       }
     }
 
@@ -249,32 +249,49 @@ class UserProgressService {
   }
 
   // Get all badges for a date range
-  Future<List<UserProgress>> getBadgesForDateRange(
-      String startDate, String endDate) async {
-    final database = await DatabaseHelper.instance.database;
-    final List<Map<String, dynamic>> maps = await database.query(
-      tableName,
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [startDate, endDate],
-      orderBy: 'date DESC',
-    );
+  // Future<List<UserProgress>> getBadgesForDateRange(
+  //     String startDate, String endDate) async {
+  //   final database = await DatabaseHelper.instance.database;
+  //   final List<Map<String, dynamic>> maps = await database.query(
+  //     tableName,
+  //     where: 'date BETWEEN ? AND ?',
+  //     whereArgs: [startDate, endDate],
+  //     orderBy: 'date DESC',
+  //   );
 
-    return List.generate(maps.length, (i) => UserProgress.fromMap(maps[i]));
-  }
+  //   return List.generate(maps.length, (i) => UserProgress.fromMap(maps[i]));
+  // }
+
+  // Future<List<UserProgress>> getLeaderboardDataWithAggregatedExercise() async {
+  //   final db = await DatabaseHelper.instance.database;
+
+  //   final List<Map<String, dynamic>> results = await db.rawQuery('''
+  //     SELECT date,
+  //            SUM(stepCount) as stepCount,
+  //            SUM(exerciseDurationMinutes) as exerciseDurationMinutes,
+  //            MAX(badge) as badge,
+  //            badgeSource
+  //     FROM user_progress
+  //     GROUP BY date
+  //     ORDER BY stepCount DESC, exerciseDurationMinutes DESC
+  //   ''');
+
+  //   return results.map((e) => UserProgress.fromMap(e)).toList();
+  // }
 
   // Get badge statistics
-  Future<Map<String, int>> getBadgeStats(
-      String startDate, String endDate) async {
-    final progress = await getBadgesForDateRange(startDate, endDate);
+  // Future<Map<String, int>> getBadgeStats(
+  //     String startDate, String endDate) async {
+  //   final progress = await getBadgesForDateRange(startDate, endDate);
 
-    return {
-      'total': progress.length,
-      'bronze': progress.where((p) => p.badge == BadgeType.bronze).length,
-      'silver': progress.where((p) => p.badge == BadgeType.silver).length,
-      'gold': progress.where((p) => p.badge == BadgeType.gold).length,
-      'fromSteps': progress.where((p) => p.badgeSource == 'steps').length,
-      'fromExercise': progress.where((p) => p.badgeSource == 'exercise').length,
-      'fromBoth': progress.where((p) => p.badgeSource == 'both').length,
-    };
-  }
+  //   return {
+  //     'total': progress.length,
+  //     'bronze': progress.where((p) => p.badge == BadgeType.bronze).length,
+  //     'silver': progress.where((p) => p.badge == BadgeType.silver).length,
+  //     'gold': progress.where((p) => p.badge == BadgeType.gold).length,
+  //     'fromSteps': progress.where((p) => p.badgeSource == 'steps').length,
+  //     'fromExercise': progress.where((p) => p.badgeSource == 'exercise').length,
+  //     'fromBoth': progress.where((p) => p.badgeSource == 'both').length,
+  //   };
+  // }
 }

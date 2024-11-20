@@ -1,113 +1,10 @@
+import 'package:FitZee/constants/exercises_data.dart';
 import 'package:flutter/material.dart';
 
 class ExercisesHomePage extends StatelessWidget {
-  final List<Map<String, String>> availableExercises = [
-    {
-      'name': 'Push-Up',
-      'asset': 'assets/images/pushups.gif',
-      'route': '/exercises/pushups'
-    },
-    {
-      'name': 'Squat',
-      'asset': 'assets/images/squats.gif',
-      'route': '/exercises/squats'
-    },
-    {
-      'name': 'Lunges',
-      'asset': 'assets/images/lunges.gif',
-      'route': '/exercises/lunges'
-    },
-    {
-      'name': 'Plank',
-      'asset': 'assets/images/planks.gif',
-      'route': '/exercises/plank'
-    },
-    {
-      'name': 'Burpees',
-      'asset': 'assets/images/burpees.gif',
-      'route': '/exercises/burpees'
-    },
-    {
-      'name': 'Jumping Jacks',
-      'asset': 'assets/images/jumping_jacks.gif',
-      'route': '/exercises/jumping_jacks'
-    },
-    {
-      'name': 'Mountain Climbers',
-      'asset': 'assets/images/mountain_climbers.gif',
-      'route': '/exercises/mountain_climbers'
-    },
-    {
-      'name': 'Deadlift',
-      'asset': 'assets/images/deadlift.gif',
-      'route': '/exercises/deadlift'
-    },
-    {
-      'name': 'Bicep Curls',
-      'asset': 'assets/images/bicep_curls.gif',
-      'route': '/exercises/bicep_curls'
-    },
-    {
-      'name': 'Tricep Dips',
-      'asset': 'assets/images/triceps.gif',
-      'route': '/exercises/triceps'
-    },
-    {
-      'name': 'Chest Press',
-      'asset': 'assets/images/chest_press.gif',
-      'route': '/exercises/chest_press'
-    },
-    {
-      'name': 'Leg Raises',
-      'asset': 'assets/images/leg_raises.gif',
-      'route': '/exercises/leg_raises'
-    },
-    {
-      'name': 'Russian Twists',
-      'asset': 'assets/images/russian_twists.gif',
-      'route': '/exercises/russian_twists'
-    },
-    {
-      'name': 'Shoulder Press',
-      'asset': 'assets/images/shoulder_press.gif',
-      'route': '/exercises/shoulder_press'
-    },
-    {
-      'name': 'High Knees',
-      'asset': 'assets/images/high_knees.gif',
-      'route': '/exercises/high_knees'
-    },
-    {
-      'name': 'Jump Rope',
-      'asset': 'assets/images/jump_rope.gif',
-      'route': '/exercises/jump_rope'
-    },
-  ];
-
-  // Categories for exercise grouping
-  final Map<String, List<String>> categories = {
-    'Gain Muscle': [
-      'Push-Up',
-      'Squat',
-      'Deadlift',
-      'Bicep Curls',
-      'Tricep Dips',
-      'Chest Press'
-    ],
-    'Boost Endurance': [
-      'Jumping Jacks',
-      'Mountain Climbers',
-      'High Knees',
-      'Burpees',
-      'Jump Rope'
-    ],
-    'Build Strength': ['Plank', 'Lunges', 'Shoulder Press', 'Leg Raises'],
-    'Increase Energy': ['Russian Twists', 'High Knees', 'Jump Rope'],
-  };
-
   // Image assets for categories
   final Map<String, String> categoryImages = {
-    'Gain Muscle': 'assets/images/musclegain.png',
+    'Gain Muscle': 'assets/images/musclegain.gif',
     'Boost Endurance': 'assets/images/endurance.jpg',
     'Build Strength': 'assets/images/buildstrength.png',
     'Increase Energy': 'assets/images/energy.jpg',
@@ -120,26 +17,31 @@ class ExercisesHomePage extends StatelessWidget {
         title: Text('Exercises', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Start today to become healthy',
-              style: TextStyle(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Start today to become healthy',
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Choose your fitness goal and start your challenge!',
-              style: TextStyle(fontSize: 16, color: Colors.black54),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: GridView.builder(
+                  color: Colors.deepPurple,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Choose your fitness goal and start your challenge!',
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap:
+                    true, // Allows GridView inside SingleChildScrollView
+                physics:
+                    NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
@@ -167,6 +69,14 @@ class ExercisesHomePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.deepPurple.shade50,
                         borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                         image: DecorationImage(
                           image: AssetImage(imageAsset),
                           fit: BoxFit.cover,
@@ -190,8 +100,9 @@ class ExercisesHomePage extends StatelessWidget {
                   );
                 },
               ),
-            ),
-          ],
+              SizedBox(height: 16),// Add ExerciseForm as a component below the grid
+            ],
+          ),
         ),
       ),
     );

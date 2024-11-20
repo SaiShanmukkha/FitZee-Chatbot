@@ -1,3 +1,4 @@
+import 'package:FitZee/pages/exercise_log/exercise_list.dart';
 import 'package:FitZee/pages/account/account_home.dart';
 import 'package:FitZee/pages/chat/chat_home.dart';
 import 'package:FitZee/pages/diet/avacado_detail.dart';
@@ -65,8 +66,8 @@ class MyApp extends StatelessWidget {
   // Light ThemeData
   final ThemeData _lightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: Color(0xFF6200EE),
-    colorScheme: ColorScheme(
+    primaryColor: const Color(0xFF6200EE),
+    colorScheme: const ColorScheme(
       primary: Color(0xFF6200EE),
       primaryContainer: Color(0xFF3700B3),
       secondary: Color(0xFF03DAC6),
@@ -92,13 +93,12 @@ class MyApp extends StatelessWidget {
   final ThemeData _darkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColor: const Color(0xFF6200EE),
-    colorScheme: ColorScheme(
+    colorScheme: const ColorScheme(
       primary: Color(0xFF6200EE),
       primaryContainer: Color(0xFF3700B3),
       secondary: Color(0xFF03DAC6),
       secondaryContainer: Color(0xFF018786),
       surface: Color(0xFF121212),
-      background: Color(0xFF121212),
       error: Color(0xFFB00020),
       onPrimary: Color(0xFFFFFFFF),
       onSecondary: Color(0xFF000000),
@@ -160,6 +160,7 @@ class MyApp extends StatelessWidget {
             '/home': (context) => const MyHomePage(title: "FitZee - Home"),
             '/login': (context) => const LoginPage(),
             '/chat': (context) => ChatPage(),
+            '/exercise_log': (context) => ExerciseList(),
             '/register': (context) => const RegisterPage(),
             '/user_data': (context) => UserDataCollectionPage(),
             '/leader_board': (context) => LeaderboardPage(),

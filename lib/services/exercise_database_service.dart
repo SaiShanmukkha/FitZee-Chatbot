@@ -27,7 +27,6 @@ class ExerciseDBService {
     await db.insert(
       tableName,
       exercise.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
     // Update user progress after inserting exercise
@@ -43,21 +42,21 @@ class ExerciseDBService {
   }
 
   // Fetch exercises by date
-  Future<List<ExerciseEntry>> fetchExercisesByDate(String date) async {
-    final db = await DatabaseHelper.instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableName,
-      where: 'date = ?',
-      whereArgs: [date],
-    );
-    return maps.map((map) => ExerciseEntry.fromMap(map)).toList();
-  }
+  // Future<List<ExerciseEntry>> fetchExercisesByDate(String date) async {
+  //   final db = await DatabaseHelper.instance.database;
+  //   final List<Map<String, dynamic>> maps = await db.query(
+  //     tableName,
+  //     where: 'date = ?',
+  //     whereArgs: [date],
+  //   );
+  //   return maps.map((map) => ExerciseEntry.fromMap(map)).toList();
+  // }
 
   // Calculate total exercise duration for a specific date
   Future<int> getTotalExerciseDuration(String date) async {
     final db = await DatabaseHelper.instance.database;
     final result = await db.rawQuery('''
-      SELECT SUM(duration * sets) as totalDuration 
+      SELECT SUM(duration) as totalDuration 
       FROM $tableName 
       WHERE date = ?
     ''', [date]);
@@ -66,36 +65,36 @@ class ExerciseDBService {
   }
 
   // Get exercise summary for a date range
-  Future<Map<String, dynamic>> getExerciseSummary(
-      String startDate, String endDate) async {
-    final db = await DatabaseHelper.instance.database;
-    final result = await db.rawQuery('''
-      SELECT 
-        COUNT(*) as totalExercises,
-        SUM(duration * sets) as totalDuration,
-        COUNT(DISTINCT date) as totalDays,
-        AVG(duration * sets) as avgDurationPerDay
-      FROM $tableName 
-      WHERE date BETWEEN ? AND ?
-    ''', [startDate, endDate]);
+  // Future<Map<String, dynamic>> getExerciseSummary(
+  //     String startDate, String endDate) async {
+  //   final db = await DatabaseHelper.instance.database;
+  //   final result = await db.rawQuery('''
+  //     SELECT
+  //       COUNT(*) as totalExercises,
+  //       SUM(duration * sets) as totalDuration,
+  //       COUNT(DISTINCT date) as totalDays,
+  //       AVG(duration * sets) as avgDurationPerDay
+  //     FROM $tableName
+  //     WHERE date BETWEEN ? AND ?
+  //   ''', [startDate, endDate]);
 
-    return result.first;
-  }
+  //   return result.first;
+  // }
 
   // Update exercise entry
-  Future<void> updateExercise(int id, ExerciseEntry updatedExercise) async {
-    final db = await DatabaseHelper.instance.database;
-    await db.update(
-      tableName,
-      updatedExercise.toMap(),
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  // Future<void> updateExercise(int id, ExerciseEntry updatedExercise) async {
+  //   final db = await DatabaseHelper.instance.database;
+  //   await db.update(
+  //     tableName,
+  //     updatedExercise.toMap(),
+  //     where: 'id = ?',
+  //     whereArgs: [id],
+  //   );
 
-    // Update user progress after updating exercise
-    final userProgressDb = UserProgressService();
-    await userProgressDb.updateProgressFromExercises(updatedExercise.date);
-  }
+  //   // Update user progress after updating exercise
+  //   final userProgressDb = UserProgressService();
+  //   await userProgressDb.updateProgressFromExercises(updatedExercise.date);
+  // }
 
   // Delete exercise entry
   Future<void> deleteExercise(int id) async {

@@ -13,7 +13,7 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    await deleteDatabaseFile(); // Optional: Delete DB file for testing
+    // await deleteDatabaseFile();
     _database = await _initDatabase();
     await checkTables(); // Check tables after initialization for verification
     return _database!;
@@ -40,11 +40,11 @@ class DatabaseHelper {
   }
 
   // Delete database for testing purposes
-  Future<void> deleteDatabaseFile() async {
-    String path = join(await getDatabasesPath(), 'FitZee_steps.db');
-    await deleteDatabase(path);
-    print("Database deleted.");
-  }
+  // Future<void> deleteDatabaseFile() async {
+  //   String path = join(await getDatabasesPath(), 'FitZee_steps.db');
+  //   await deleteDatabase(path);
+  //   print("Database deleted.");
+  // }
 
   // Check tables in the database
   Future<void> checkTables() async {

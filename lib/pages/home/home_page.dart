@@ -51,7 +51,6 @@ class MyHomePageState extends State<MyHomePage> {
           fontSize: 24,
           fontWeight: FontWeight.w700,
         ),
-        
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -92,6 +91,8 @@ class MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   _buildGridItem(Icons.directions_walk, "Step Count",
                       () => Navigator.pushNamed(context, '/step_count')),
+                  _buildGridItem(Icons.data_object, "Exercise Log",
+                      () => Navigator.pushNamed(context, '/exercise_log')),
                   _buildGridItem(Icons.fastfood, "Diet",
                       () => Navigator.pushNamed(context, '/diet_home')),
                   _buildGridItem(Icons.fitness_center, "Exercise",
@@ -100,7 +101,7 @@ class MyHomePageState extends State<MyHomePage> {
                       () => Navigator.pushNamed(context, '/account')),
                   _buildGridItem(Icons.leaderboard, "Leader Board",
                       () => Navigator.pushNamed(context, '/leader_board')),
-                  _buildGridItem(Icons.chat_bubble_outline, "Chat",
+                  _buildGridItem(Icons.chat_outlined, "FitZee Bot",
                       () => Navigator.pushNamed(context, '/chat')),
                   _buildGridItem(
                       Icons.data_exploration_rounded,
@@ -158,7 +159,7 @@ class MyHomePageState extends State<MyHomePage> {
                         AnimatedSwitcher(
                           duration: const Duration(seconds: 1),
                           child: Text(
-                            _getBMICategory(),
+                            "Category: ${_getBMICategory()}",
                             style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,

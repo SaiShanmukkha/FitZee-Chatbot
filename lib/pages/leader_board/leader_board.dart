@@ -15,8 +15,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   late Future<List<dynamic>> _topUsers;
   late Future<Map<BadgeType, int>> _badgeTotals;
   int totalPoints = 0;
-  int userLevel = 0;
-  double progressToNextLevel = 0.0;
+  String userTier = 'Bronze'; // Default Tier
+  double progressToNextTier = 0.0;
 
   @override
   void initState() {
@@ -24,11 +24,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     _topUsers = _fetchTopUsers();
     _leaderboardData = UserProgressService().getLeaderboardData();
     _badgeTotals = UserProgressService().getBadgeTotals();
-    _loadPointsAndCalculateLevel();
+    _loadPointsAndCalculateTier();
   }
 
   Future<List<dynamic>> _fetchTopUsers() async {
-    final response = await http.get(Uri.parse('https://gettopusers-ighj26hgva-uc.a.run.app'));
+    final response = await http
+        .get(Uri.parse('https://gettopusers-ighj26hgva-uc.a.run.app'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -36,13 +37,33 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
-  Future<void> _loadPointsAndCalculateLevel() async {
+  Future<void> _loadPointsAndCalculateTier() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       totalPoints = prefs.getInt('totalPoints') ?? 0;
-      userLevel = totalPoints ~/ 30;
-      progressToNextLevel = (totalPoints % 30) / 30;
+      userTier = _calculateTier(totalPoints);
+      progressToNextTier = _calculateProgressToNextTier(totalPoints);
     });
+  }
+
+  String _calculateTier(int points) {
+    const tiers = [
+      'Bronze',
+      'Silver',
+      'Gold',
+      'Platinum',
+      'Diamond',
+      'Master',
+      'GrandMaster',
+      'Pro',
+    ];
+    int tierIndex = points ~/ 90; // Each tier spans 90 points
+    if (tierIndex >= tiers.length) tierIndex = tiers.length - 1; // Cap at "Pro"
+    return tiers[tierIndex];
+  }
+
+  double _calculateProgressToNextTier(int points) {
+    return (points % 90) / 90;
   }
 
   Widget _getBadgeImage(BadgeType badge) {
@@ -107,19 +128,19 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Level: $userLevel',
+                              'Tier: $userTier',
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 8),
                             LinearProgressIndicator(
-                              value: progressToNextLevel,
+                              value: progressToNextTier,
                               backgroundColor: Colors.grey[300],
                               color: Colors.blue,
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Next Level in ${30 - (totalPoints % 30)} points',
+                              'Next Tier in ${90 - (totalPoints % 90)} points',
                               style: TextStyle(fontSize: 16),
                             ),
                           ],
@@ -146,7 +167,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 Text(
                                     'Bronze: ${badgeTotals[BadgeType.bronze] ?? 0}'),
                                 SizedBox(height: 4),
-                                Text('10 points',
+                                Text('1 points',
                                     style: TextStyle(color: Colors.grey)),
                               ],
                             ),
@@ -158,7 +179,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 Text(
                                     'Silver: ${badgeTotals[BadgeType.silver] ?? 0}'),
                                 SizedBox(height: 4),
-                                Text('15 points',
+                                Text('2 points',
                                     style: TextStyle(color: Colors.grey)),
                               ],
                             ),
@@ -170,13 +191,14 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 Text(
                                     'Gold: ${badgeTotals[BadgeType.gold] ?? 0}'),
                                 SizedBox(height: 4),
-                                Text('30 points',
+                                Text('3 points',
                                     style: TextStyle(color: Colors.grey)),
                               ],
                             ),
                           ],
                         ),
                       ),
+                      SizedBox(height: 16),
                       Text(
                         'Top 5 Users',
                         style: TextStyle(
@@ -207,22 +229,23 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 itemBuilder: (context, index) {
                                   final user = topUsers[index];
                                   final userPoints = user['points'];
-                                  final userLevel = userPoints ~/ 30;
                                   return ListTile(
-                                    leading: Icon(
+                                    leading: const Icon(
                                       Icons.emoji_events,
                                       color: Colors.amber,
                                       size: 30,
                                     ),
                                     title: Text(
                                       '${user['firstName']} ${user['lastName']}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
-                                      'Points: $userPoints, Level: $userLevel',
-                                      style: TextStyle(fontSize: 16),
+                                      'Points: $userPoints, Tier: ${_calculateTier(userPoints)}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   );
                                 },
@@ -231,68 +254,68 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           },
                         ),
                       ),
+                      SizedBox(height: 16),
                       Text(
                         'My Daily Progress',
                         style: TextStyle(
-                            color: Colors.deepPurple[900],
-                            fontWeight: FontWeight.w900,
-                            fontSize: 24),
-                      ),
-                      SizedBox(
-                        height: 300, // Adjust height as needed
-                        child: FutureBuilder<List<UserProgress>>(
-                          future: _leaderboardData,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text("Error loading data"));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Center(child: Text("No data available"));
-                            } else {
-                              final leaderboard = snapshot.data!;
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: leaderboard.length,
-                                itemBuilder: (context, index) {
-                                  final userProgress = leaderboard[index];
-                                  return ListTile(
-                                    leading: _getBadgeImage(userProgress.badge),
-                                    title: Text(
-                                      'Date: ${userProgress.date}',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                'Steps: ${userProgress.stepCount}'),
-                                            Text(
-                                                'Exercise: ${userProgress.exerciseDurationMinutes} mins'),
-                                          ],
-                                        ),
-                                        Text(
-                                          '${userProgress.badgeSource}',
-                                          style:
-                                              TextStyle(color: Colors.blueGrey),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-                          },
+                          color: Colors.deepPurple[900],
+                          fontWeight: FontWeight.w900,
+                          fontSize: 24,
                         ),
+                      ),
+                      FutureBuilder<List<UserProgress>>(
+                        future: _leaderboardData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text("Error loading data"));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(child: Text("No data available"));
+                          } else {
+                            final leaderboard = snapshot.data!;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: leaderboard.length,
+                              itemBuilder: (context, index) {
+                                final userProgress = leaderboard[index];
+                                return ListTile(
+                                  leading: _getBadgeImage(userProgress.badge),
+                                  title: Text(
+                                    'Date: ${userProgress.date}',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              'Steps: ${userProgress.stepCount}'),
+                                          Text(
+                                              'Exercise: ${userProgress.exerciseDurationMinutes} mins'),
+                                        ],
+                                      ),
+                                      Text(
+                                        '${userProgress.badgeSource}',
+                                        style:
+                                            TextStyle(color: Colors.blueGrey),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
                       ),
                     ],
                   );
