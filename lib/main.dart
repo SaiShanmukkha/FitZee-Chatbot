@@ -1,7 +1,16 @@
+import 'package:FitZee/pages/diet/berries_df.dart';
+import 'package:FitZee/pages/diet/cheese_df.dart';
+import 'package:FitZee/pages/diet/greekyogurt_df.dart';
+import 'package:FitZee/pages/diet/guacamole_df.dart';
+import 'package:FitZee/pages/diet/leafygreens_df.dart';
+import 'package:FitZee/pages/diet/leanprotein_df.dart';
+import 'package:FitZee/pages/diet/leanredmeat_df.dart';
+import 'package:FitZee/pages/diet/nutbutter_df.dart';
+import 'package:FitZee/pages/diet/wholebread_df.dart';
+import 'package:FitZee/pages/diet/wholeeggs_df.dart';
 import 'package:FitZee/pages/exercise_log/exercise_list.dart';
 import 'package:FitZee/pages/account/account_home.dart';
 import 'package:FitZee/pages/chat/chat_home.dart';
-import 'package:FitZee/pages/diet/avacado_detail.dart';
 import 'package:FitZee/pages/diet/diet_home.dart';
 import 'package:FitZee/pages/exercises/bicep_curls.dart';
 import 'package:FitZee/pages/exercises/burpes.dart';
@@ -165,9 +174,18 @@ class MyApp extends StatelessWidget {
             '/user_data': (context) => UserDataCollectionPage(),
             '/leader_board': (context) => LeaderboardPage(),
             '/diet_home': (context) => DietHomePage(),
-            '/food_detail': (context) => FoodDetail(),
-            '/account': (context) => AccountHome(),
-            '/step_count': (context) => LiveStepCount(),
+            '/diet/guacamole': (context) => GuacamoleDietFoodDetail(),
+            '/diet/nutbutter': (context) => NutsAndNutButterDetail(),
+            '/diet/wholegrain': (context) => WholeGrainBreadDetail(),
+            '/diet/cheese': (context) => CheeseDetail(),
+            '/diet/redmeat': (context) => LeanRedMeatDetail(),
+            '/diet/leafygreens': (context) => LeafyGreensDetail(),
+            '/diet/leanprotein': (context) => LeanProteinDetail(),
+            '/diet/berries': (context) => BerriesDetail(),
+            '/diet/wholeeggs': (context) => WholeEggsDetail(),
+            '/diet/greekyogurt': (context) => GreekYogurtDetail(),
+            '/account': (context) => const AccountHome(),
+            '/step_count': (context) => const LiveStepCount(),
             '/step_data_page': (context) => StepDataPage(),
             '/exercises': (context) => ExercisesHomePage(),
             '/exercises/pushups': (context) => PushUpDetailPage(),

@@ -200,59 +200,57 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Top 5 Users',
+                        'Top Users',
                         style: TextStyle(
                           color: Colors.deepPurple[900],
                           fontWeight: FontWeight.w900,
                           fontSize: 24,
                         ),
                       ),
-                      SizedBox(
-                        height: 200,
-                        child: FutureBuilder<List<dynamic>>(
-                          future: _topUsers,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text("Error loading data"));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Center(child: Text("No data available"));
-                            } else {
-                              final topUsers = snapshot.data!;
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: topUsers.length,
-                                itemBuilder: (context, index) {
-                                  final user = topUsers[index];
-                                  final userPoints = user['points'];
-                                  return ListTile(
-                                    leading: const Icon(
-                                      Icons.emoji_events,
-                                      color: Colors.amber,
-                                      size: 30,
+                      SizedBox(height: 16),
+                      FutureBuilder<List<dynamic>>(
+                        future: _topUsers,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text("Error loading data"));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(child: Text("No data available"));
+                          } else {
+                            final topUsers = snapshot.data!;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: topUsers.length,
+                              itemBuilder: (context, index) {
+                                final user = topUsers[index];
+                                final userPoints = user['points'];
+                                return ListTile(
+                                  leading: const Icon(
+                                    Icons.emoji_events,
+                                    color: Colors.amber,
+                                    size: 30,
+                                  ),
+                                  title: Text(
+                                    '${user['firstName']} ${user['lastName']}',
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    'Points: $userPoints, Tier: ${_calculateTier(userPoints)}',
+                                    style: TextStyle(
+                                      fontSize: 16,
                                     ),
-                                    title: Text(
-                                      '${user['firstName']} ${user['lastName']}',
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Text(
-                                      'Points: $userPoints, Tier: ${_calculateTier(userPoints)}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-                          },
-                        ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
                       ),
                       SizedBox(height: 16),
                       Text(
@@ -263,6 +261,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           fontSize: 24,
                         ),
                       ),
+                      SizedBox(height: 16),
                       FutureBuilder<List<UserProgress>>(
                         future: _leaderboardData,
                         builder: (context, snapshot) {
