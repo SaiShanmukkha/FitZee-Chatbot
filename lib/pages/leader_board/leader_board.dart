@@ -39,11 +39,16 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
   Future<void> _loadPointsAndCalculateTier() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    final oldTier = userTier;
     setState(() {
       totalPoints = prefs.getInt('totalPoints') ?? 0;
       userTier = _calculateTier(totalPoints);
       progressToNextTier = _calculateProgressToNextTier(totalPoints);
     });
+
+    if (oldTier != userTier) {
+      _showTierChangeDialog(oldTier, userTier);
+    }
   }
 
   String _calculateTier(int points) {
@@ -82,6 +87,28 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         return Icon(Icons.badge, color: Colors.grey, size: 30);
     }
     return Image.asset(imagePath, width: 30, height: 30);
+  }
+
+  void _showTierChangeDialog(String oldTier, String newTier) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Congratulations! 🎉'),
+        content: Text(
+          'You have progressed from $oldTier tier to $newTier tier. Keep it up!',
+          style: const TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Okay',
+              style: TextStyle(color: Colors.deepPurple),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
