@@ -17,10 +17,10 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
   final TextEditingController weightController = TextEditingController();
   final TextEditingController weightGoalController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
-  
+
   String weightGoal = 'Gain'; // Default value for weight goal
   String gender = 'Male'; // Default gender value
-  
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late UserDataSyncService _userDataSyncService;
@@ -28,7 +28,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
   int currentStep = 0;
 
   double heightValue = 150; // Default height value (150 cm)
-  
+
   @override
   void initState() {
     super.initState();
@@ -177,7 +177,8 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                     );
                     if (pickedDate != null) {
                       setState(() {
-                        dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                        dobController.text =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
                       });
                     }
                   },
@@ -215,7 +216,8 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                   onChanged: (double newValue) {
                     setState(() {
                       heightValue = newValue;
-                      heightController.text = "${heightValue.round()}"; // Update the text field value
+                      heightController.text =
+                          "${heightValue.round()}"; // Update the text field value
                     });
                   },
                 ),

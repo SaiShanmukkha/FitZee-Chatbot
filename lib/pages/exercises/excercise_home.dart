@@ -1,5 +1,5 @@
-import 'package:FitZee/constants/exercises_data.dart';
 import 'package:flutter/material.dart';
+import 'package:FitZee/components/workout_tracker.dart';
 
 class ExercisesHomePage extends StatelessWidget {
   // Image assets for categories
@@ -14,7 +14,7 @@ class ExercisesHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercises', style: TextStyle(color: Colors.white)),
+        title: const Text('Exercises', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
       ),
       body: SingleChildScrollView(
@@ -23,7 +23,7 @@ class ExercisesHomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Start today to become healthy',
                 style: TextStyle(
                   fontSize: 24,
@@ -31,76 +31,95 @@ class ExercisesHomePage extends StatelessWidget {
                   color: Colors.deepPurple,
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
+              const SizedBox(height: 8),
+              const Text(
                 'Choose your fitness goal and start your challenge!',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               GridView.builder(
-                shrinkWrap:
-                    true, // Allows GridView inside SingleChildScrollView
-                physics:
-                    NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: categories.keys.length,
+                itemCount: categoryImages.keys.length,
                 itemBuilder: (context, index) {
-                  String category = categories.keys.elementAt(index);
+                  String category = categoryImages.keys.elementAt(index);
                   String imageAsset = categoryImages[category]!;
+
                   return GestureDetector(
                     onTap: () {
-                      // Navigate to a new page that lists exercises for this category
+                      // Navigate to the exercises for this category
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => CategoryExercisePage(
                             category: category,
-                            exercises: categories[category]!,
-                            availableExercises: availableExercises,
+                            exercises: [], // Add exercises here if needed
+                            availableExercises: [], // Add available exercises
                           ),
                         ),
                       );
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
+                    child: Stack(
+                      children: [
+                        // Background image with shadow for 3D effect
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 8,
+                                offset: const Offset(2, 4),
+                              ),
+                            ],
                           ),
-                        ],
-                        image: DecorationImage(
-                          image: AssetImage(imageAsset),
-                          fit: BoxFit.cover,
-                          colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.3),
-                            BlendMode.darken,
-                          ),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              imageAsset,
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
+                            ),
                           ),
                         ),
-                      ),
+                        // Category name
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: const BorderRadius.vertical(
+                                  bottom: Radius.circular(16)),
+                            ),
+                            child: Text(
+                              category,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
               ),
-              SizedBox(height: 16),// Add ExerciseForm as a component below the grid
+              const SizedBox(height: 16),
+              WorkoutTracker(),
             ],
           ),
         ),
@@ -115,7 +134,7 @@ class CategoryExercisePage extends StatelessWidget {
   final List<String> exercises;
   final List<Map<String, String>> availableExercises;
 
-  CategoryExercisePage({
+  const CategoryExercisePage({
     required this.category,
     required this.exercises,
     required this.availableExercises,
@@ -129,7 +148,7 @@ class CategoryExercisePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(category, style: TextStyle(color: Colors.white)),
+        title: Text(category, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
       ),
       body: Padding(
@@ -146,7 +165,7 @@ class CategoryExercisePage extends StatelessWidget {
               ),
               title: Text(
                 exercise['name']!,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               onTap: () {
                 Navigator.pushNamed(context, exercise['route']!);

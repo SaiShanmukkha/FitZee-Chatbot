@@ -100,7 +100,9 @@ class LiveStepCount extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: const Text('Step Counter')),
+        appBar: AppBar(
+          title: const Text('Step Counter'),
+        ),
         body: const SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(scaffoldPadding),
@@ -134,10 +136,7 @@ class _StepDataState extends State<StepData> {
   int? stepCountStream;
   PedestrianStatus? pedestrianStatusStream;
 
-  /// Only for IOS out of the box.
-  /// For android use a combination of getStepCount and stepCountStream. (Example code below)
   int? stepCountStreamFrom;
-  // only used to show how to implement the streamFrom in android
   int? androidFirstStepFrom;
 
   StreamSubscription? _stepStream;
@@ -240,17 +239,12 @@ class _StepDataState extends State<StepData> {
   void _listenStepCountStreamFrom() async {
     try {
       if (Platform.isAndroid) {
-        /// In android this call is not supported but you can mix the getStep and the stream.
-        /// For this you need to save the first stepCount from the stream and subtract this plus the last steps amount registered
-        /// and add the difference.
         stepCountStreamFrom =
             await Pedometer().getStepCount(from: from, to: DateTime.now());
         setState(() {});
 
         _stepStreamFrom = Pedometer().stepCountStream().listen((step) {
           if (androidFirstStepFrom == null) {
-            // Like this you may lose some steps if the original count was 0.
-            // You can improve this condition, this is just to show and example.
             androidFirstStepFrom = step;
             return;
           }
@@ -316,8 +310,8 @@ class _StepDataState extends State<StepData> {
         // ),
         // const SizedBox(height: 16),
         StepDataSquare(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          foregroundColor: Theme.of(context).colorScheme.onBackground,
+          backgroundColor: const Color.fromARGB(255, 172, 134, 22),
+          foregroundColor: const Color.fromARGB(255, 40, 32, 8),
           name: 'Pedestrian Status',
           functionName: 'pedestrianStatusStream()',
           value: _enumToString(pedestrianStatusStream),
@@ -325,8 +319,8 @@ class _StepDataState extends State<StepData> {
         ),
         const SizedBox(height: 8),
         StepDataSquare(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          foregroundColor: Theme.of(context).colorScheme.onBackground,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           time: 'Last boot - now',
           name: 'Step Count Since Last Reboot',
           functionName: '',
