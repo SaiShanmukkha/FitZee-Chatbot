@@ -15,8 +15,6 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
   final TextEditingController dobController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
-  final TextEditingController weightGoalController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
 
   String weightGoal = 'Gain'; // Default value for weight goal
   String gender = 'Male'; // Default gender value
@@ -33,52 +31,81 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
   void initState() {
     super.initState();
     _userDataSyncService = UserDataSyncService();
-    checkUserData();
+    _fetchExistingUserData(); // Fetch existing user data and pre-fill fields
   }
 
-  Future<void> checkUserData() async {
+  Future<void> _fetchExistingUserData() async {
     final user = _auth.currentUser;
-
     if (user != null) {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      try {
+        final doc = await _firestore.collection('users').doc(user.uid).get();
 
-      if (doc.exists && doc['tookInitialValue'] == true) {
-        await _userDataSyncService.fetchAndStoreUserData();
-        Navigator.pushReplacementNamed(context, "/home");
+        if (doc.exists) {
+          // Pre-fill existing data into controllers
+          final data = doc.data()!;
+          setState(() {
+            firstNameController.text = data['firstName'] ?? '';
+            lastNameController.text = data['lastName'] ?? '';
+            dobController.text = data['dateOfBirth'] ?? '';
+            heightController.text = data['height'] ?? '150'; // Default to 150
+            weightController.text = data['weight'] ?? '';
+            weightGoal = data['weightGoal'] ?? 'Gain';
+            gender = data['gender'] ?? 'Male';
+            heightValue = double.tryParse(heightController.text) ?? 150;
+          });
+        }
+      } catch (e) {
+        print('Error fetching user data: $e');
       }
     }
   }
 
   Future<void> saveUserData() async {
-    final user = _auth.currentUser;
+    if (_validateInputs()) {
+      final user = _auth.currentUser;
 
-    if (user != null) {
-      try {
-        // Prepare user data
-        Map<String, dynamic> userData = {
-          'userID': user.uid,
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
-          'dateOfBirth': dobController.text,
-          'height': heightController.text,
-          'weight': weightController.text,
-          'gender': gender,
-          'weightGoal': weightGoal,
-          'tookInitialValue': true,
-        };
+      if (user != null) {
+        try {
+          // Prepare user data
+          Map<String, dynamic> userData = {
+            'userID': user.uid,
+            'firstName': firstNameController.text.trim(),
+            'lastName': lastNameController.text.trim(),
+            'dateOfBirth': dobController.text.trim(),
+            'height': heightController.text.trim(),
+            'weight': weightController.text.trim(),
+            'gender': gender,
+            'weightGoal': weightGoal,
+            'tookInitialValue': true,
+          };
 
-        // Save user data to Firestore
-        await _firestore.collection('users').doc(user.uid).set(userData);
+          // Save user data to Firestore
+          await _firestore.collection('users').doc(user.uid).set(userData);
 
-        // Sync data locally after saving it to Firestore
-        await _userDataSyncService.fetchAndStoreUserData();
+          // Sync data locally after saving it to Firestore
+          await _userDataSyncService.fetchAndStoreUserData();
 
-        // Navigate to Home Page after saving data
-        Navigator.pushReplacementNamed(context, "/home");
-      } catch (e) {
-        print('Error saving user data: $e');
+          // Navigate to Home Page after saving data
+          Navigator.pushReplacementNamed(context, "/home");
+        } catch (e) {
+          print('Error saving user data: $e');
+        }
       }
+    } else {
+      // Show error message if validation fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields.')),
+      );
     }
+  }
+
+  bool _validateInputs() {
+    // Ensure no fields are empty
+    return firstNameController.text.isNotEmpty &&
+        lastNameController.text.isNotEmpty &&
+        dobController.text.isNotEmpty &&
+        heightController.text.isNotEmpty &&
+        weightController.text.isNotEmpty;
   }
 
   void moveToNextStep() {
@@ -93,10 +120,15 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
     });
   }
 
-  Widget buildStepCard(String label, TextEditingController controller,
-      IconData icon, Color color, String hintText, Widget? field) {
+  Widget buildStepCard(
+      String label,
+      TextEditingController? controller, // Make this optional
+      IconData icon,
+      Color color,
+      String hintText,
+      Widget? field) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       child: Card(
         color: color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -109,30 +141,31 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
               Icon(icon, size: 50, color: Colors.white),
               const SizedBox(height: 20),
               Text(label,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 22,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               field ??
                   TextField(
-                    controller: controller,
+                    controller: controller, // Safely assign nullable controller
                     decoration: InputDecoration(
                       hintText: hintText,
-                      hintStyle: TextStyle(color: Colors.white70),
-                      enabledBorder: OutlineInputBorder(
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white)),
-                      focusedBorder: OutlineInputBorder(
+                      focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white)),
                       filled: true,
                       fillColor: Colors.white24,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: moveToNextStep,
-                child: Text('Next', style: TextStyle(color: Colors.white)),
+                child:
+                    const Text('Next', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
@@ -149,7 +182,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Complete Your Profile')),
+      appBar: AppBar(title: const Text('Complete Your Profile')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -187,15 +220,15 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                       controller: dobController,
                       decoration: InputDecoration(
                         hintText: "YYYY-MM-DD",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        enabledBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white)),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white)),
                         filled: true,
                         fillColor: Colors.white24,
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -216,8 +249,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                   onChanged: (double newValue) {
                     setState(() {
                       heightValue = newValue;
-                      heightController.text =
-                          "${heightValue.round()}"; // Update the text field value
+                      heightController.text = "${heightValue.round()}";
                     });
                   },
                 ),
@@ -228,7 +260,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
             if (currentStep == 5)
               buildStepCard(
                 "Gender",
-                genderController,
+                null, // No controller needed
                 Icons.wc,
                 Colors.teal,
                 "Select your gender",
@@ -243,7 +275,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                         });
                       },
                     ),
-                    Text('Male', style: TextStyle(color: Colors.white)),
+                    const Text('Male', style: TextStyle(color: Colors.white)),
                     Radio<String>(
                       value: 'Female',
                       groupValue: gender,
@@ -253,16 +285,16 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                         });
                       },
                     ),
-                    Text('Female', style: TextStyle(color: Colors.white)),
+                    const Text('Female', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
             if (currentStep == 6)
               buildStepCard(
                 "Weight Goal",
-                weightGoalController,
+                null, // No controller needed
                 Icons.assignment_turned_in,
-                Colors.yellow,
+                const Color.fromARGB(255, 79, 73, 6),
                 "Select weight goal",
                 Row(
                   children: [
@@ -275,7 +307,7 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                         });
                       },
                     ),
-                    Text('Gain', style: TextStyle(color: Colors.white)),
+                    const Text('Gain', style: TextStyle(color: Colors.white)),
                     Radio<String>(
                       value: 'Lose',
                       groupValue: weightGoal,
@@ -285,14 +317,15 @@ class _UserDataCollectionPageState extends State<UserDataCollectionPage> {
                         });
                       },
                     ),
-                    Text('Lose', style: TextStyle(color: Colors.white)),
+                    const Text('Lose', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
             if (currentStep == 7)
               ElevatedButton(
                 onPressed: saveUserData,
-                child: Text('Save', style: TextStyle(color: Colors.white)),
+                child:
+                    const Text('Save', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(

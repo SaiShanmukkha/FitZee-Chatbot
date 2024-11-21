@@ -1,3 +1,4 @@
+import 'package:FitZee/constants/exercises_data.dart';
 import 'package:flutter/material.dart';
 import 'package:FitZee/components/workout_tracker.dart';
 
@@ -58,8 +59,8 @@ class ExercisesHomePage extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => CategoryExercisePage(
                             category: category,
-                            exercises: [], // Add exercises here if needed
-                            availableExercises: [], // Add available exercises
+                            exercises: categories[category]!,
+                            availableExercises: availableExercises,
                           ),
                         ),
                       );
@@ -165,7 +166,8 @@ class CategoryExercisePage extends StatelessWidget {
               ),
               title: Text(
                 exercise['name']!,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               onTap: () {
                 Navigator.pushNamed(context, exercise['route']!);
