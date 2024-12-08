@@ -76,21 +76,28 @@ Before starting, ensure you have the following:
 
 ---
 
-## Step 4: Create and Run a Flutter App
+## Step 4: Get the code for FitZee Flutter App
 
 1. **Create a New Flutter Project:**
    - Run the following command:
-     bash
-     flutter create my_app
-     
-   - Replace `my_app` with your desired project name.
+     ```bash
+     flutter pub get
+     ```
+2. **Make sure you have emulator running or andriod devie connected via USB to PC (which should have USB debugging enabled)**
+   - To see emulators
+     ```bash
+     flutter emulators
+     ```
+     To Launch an emulator
+     ```bash
+     flutter emulators --launch <emulator-id>
+     ```
+   - To see available devices
+     ```bash
+     flutter devices
+     ```
 
-2. **Navigate to the Project Directory:**
-   ```bash
-   cd my_app
-   ```
-
-3. **Run the App:**
+4. **Run the App:**
    - Launch your Android emulator.
    - Run the following command to start the app:
      ```bash
@@ -101,17 +108,17 @@ Before starting, ensure you have the following:
 
 ## Step 5: Build an Android APK
 
-1. **Prepare Your Project for Release:**
-   - Open `android/app/build.gradle` and set the `minSdkVersion` to at least `21`.
+1. **Prepare everything for good FitZee app release.**
 
-2. **Generate the APK:**
+3. **Generate the APK:**
    - Run the following command to build the release APK:
-     bash
+     ```bash
      flutter build apk --release
+     ```
      
    - The APK will be located at `build/app/outputs/flutter-apk/app-release.apk`.
 
-3. **Install APK on Device:**
+4. **Install APK on Device:**
    - Transfer the APK to your Android device and install it.
 
 ---
@@ -126,13 +133,13 @@ Before starting, ensure you have the following:
 
 3. **Build Fails:**
    - Run the following command to clean the build directory:
-     bash
+     ```bash
      flutter clean
-     
+     ```
    - Then rebuild:
-     bash
+     ```bash
      flutter build apk --release
-     
+     ```
 
 ---
 
@@ -143,5 +150,3 @@ Before starting, ensure you have the following:
 - [Flutter Community](https://flutter.dev/community)
 
 ---
-
-Enjoy developing with Flutter! 🚀
