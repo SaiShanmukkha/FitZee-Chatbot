@@ -1,4 +1,3 @@
-markdown
 # Flutter Installation and Setup Guide
 
 This guide will walk you through the steps to install Flutter, set up Android Studio, download API 33 Android emulator, configure the Flutter toolchain, and run a Flutter application. Additionally, it includes instructions to build an Android APK.
